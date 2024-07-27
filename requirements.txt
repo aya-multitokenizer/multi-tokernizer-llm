@@ -3,3 +3,5 @@ torch
 tqdm
 tokenizers
 datasets
+lightning
+wandb

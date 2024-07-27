@@ -166,7 +166,7 @@ class MultiTokenizerLLM(nn.Module):
             [Block(c, h, t, n_heads, dropout, feedforward_factor)]
         )
 
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor = None) -> torch.Tensor:
+    def forward(self, idx: torch.Tensor) -> torch.Tensor:
         """Forward pass of the multi-tokenizer language model."""
         token_emb = self.token_embedding_table(
             idx
@@ -178,16 +178,7 @@ class MultiTokenizerLLM(nn.Module):
             x = layer(x)
 
         logits = self.lm_head(x)  # batch_dim, sequence_dim, vocab_size
-
-        batch_dim, sequence_dim, embedding_dim = logits.size()
-
-        if targets is None:
-            return logits, None
-        else:
-            logits_loss_view = logits.view(-1, self.vocab_size)
-            targets_loss_view = targets.view(-1)
-            loss = F.cross_entropy(logits_loss_view, targets_loss_view)
-            return logits, loss
+        return logits
 
     def generate(self, idx: torch.Tensor, max_new_tokens: int) -> torch.Tensor:
         """Generate new tokens."""
